@@ -12,7 +12,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.0.0"),
-        .package(url: "https://github.com/mat2uken/HaishinKit.swift.git", branch: "1.5.0"),
+        .package(url: "https://github.com/mat2uken/HaishinKit.swift.git", branch: "v1.5-ae"),
     ],
     targets: [
         .binaryTarget(
