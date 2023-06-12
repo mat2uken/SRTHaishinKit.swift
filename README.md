@@ -7,7 +7,7 @@
 ## 🎨 Features
 ### SRT
 - [x] Publish and Recording (H264/AAC)
-- [x] Playback
+- [ ] Playback
 - [ ] mode
   - [x] caller
   - [x] listener
@@ -29,7 +29,7 @@ github "shogo4405/SRTHaishinKit.swift" "0.1.1"
 ```
 ### Swift Package Manager
 ```
-https://github.com/shogo4405/HaishinKit.swift
+https://github.com/shogo4405/SRTHaishinKit.swift
 ```
 
 ## ☕ Cocoa Keys
