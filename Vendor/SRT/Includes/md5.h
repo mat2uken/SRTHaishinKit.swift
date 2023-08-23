@@ -47,8 +47,8 @@
   1999-05-03 lpd Original version.
  */
 
-#ifndef md5_INCLUDED
-#  define md5_INCLUDED
+#ifndef srt_md5_INCLUDED
+#  define srt_md5_INCLUDED
 
 /*
  * All symbols have been put under the srt namespace
