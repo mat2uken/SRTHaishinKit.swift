@@ -36,7 +36,7 @@ srt_macosx() {
 }
 
 # compile
-srt_macosx
+#srt_macosx
 
 export IPHONEOS_DEPLOYMENT_TARGET=11.0
 SDKVERSION=$(xcrun --sdk iphoneos --show-sdk-version)
@@ -59,6 +59,5 @@ rm -rf libsrt.xcframework
 xcodebuild -create-xcframework \
     -library ./build/simulator/libsrt.a -headers Includes \
     -library ./build/device/libsrt.a -headers Includes \
-    -library ./build/macosx/libsrt.a -headers Includes \
     -output libsrt.xcframework
 
