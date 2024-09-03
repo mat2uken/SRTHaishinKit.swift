@@ -4,7 +4,7 @@ import AVFoundation
 import libsrt
 
 /// An object that provides the interface to control a one-way channel over a SRTConnection.
-public class SRTStream: NetStream {
+public final class SRTStream: NetStream {
     private enum ReadyState: UInt8 {
         case initialized = 0
         case open        = 1
@@ -21,14 +21,14 @@ public class SRTStream: NetStream {
     private weak var connection: SRTConnection?
     private lazy var audioEngine: AVAudioEngine = .init()
 
-    private lazy var writer: TSWriter = {
-        var writer = TSWriter()
+    private lazy var writer: TSWriter<SRTStream> = {
+        var writer = TSWriter<SRTStream>()
         writer.delegate = self
         return writer
     }()
 
-    private lazy var reader: TSReader = {
-        var reader = TSReader()
+    private lazy var reader: TSReader<SRTStream> = {
+        var reader = TSReader<SRTStream>()
         reader.delegate = self
         return reader
     }()
@@ -41,7 +41,7 @@ public class SRTStream: NetStream {
 
             switch oldValue {
             case .publishing:
-                writer.stopRunning()
+//                writer.stopRunning()
                 mixer.stopEncoding()
             case .playing:
                 mixer.stopDecoding()
@@ -56,9 +56,9 @@ public class SRTStream: NetStream {
                 mixer.startDecoding()
                 readyState = .playing
             case .publish:
-                mixer.startEncoding(writer)
+                mixer.startEncoding(self)
                 mixer.startRunning()
-                writer.startRunning()
+//                writer.startRunning()
                 readyState = .publishing
             default:
                 break
@@ -183,19 +183,34 @@ public class SRTStream: NetStream {
     }
 }
 
+extension SRTStream: AVCodecDelegate {
+    public func audioCodec(_ codec: HaishinKit.AudioCodec, didOutput audioFormat: AVAudioFormat) {}
+    public func audioCodec(_ codec: HaishinKit.AudioCodec, didOutput audioBuffer: AVAudioBuffer, presentationTimeStamp: CMTime) {}
+    public func audioCodec(_ codec: HaishinKit.AudioCodec, errorOccurred error: HaishinKit.AudioCodec.Error) {}
+
+    public func videoCodec(_ codec: VideoCodec, didOutput formatDescription: CMFormatDescription?) {}
+    public func videoCodec(_ codec: VideoCodec, didOutput sampleBuffer: CMSampleBuffer) {}
+    public func videoCodec(_ codec: VideoCodec, errorOccurred error: VideoCodec.Error) {}
+    public func videoCodecWillDropFame(_ codec: VideoCodec) -> Bool {
+        return true
+    }
+}
+
 extension SRTStream: TSWriterDelegate {
     // MARK: TSWriterDelegate
-    public func writer(_ writer: TSWriter, didOutput data: Data) {
+    public func writer(_ writer: TSWriter<SRTStream>, didOutput data: Data) {
         guard readyState == .publishing else {
             return
         }
         connection?.socket?.doOutput(data: data)
     }
+    public func writer(_ writer: TSWriter<SRTStream>, didRotateFileHandle timestamp: CMTime) {
+    }
 }
 
 extension SRTStream: TSReaderDelegate {
     // MARK: TSReaderDelegate
-    public func reader(_ reader: TSReader, id: UInt16, didRead formatDescription: CMFormatDescription) {
+    public func reader(_ reader: TSReader<SRTStream>, id: UInt16, didRead formatDescription: CMFormatDescription) {
         guard readyState == .playing else {
             return
         }
@@ -207,7 +222,7 @@ extension SRTStream: TSReaderDelegate {
         }
     }
 
-    public func reader(_ reader: TSReader, id: UInt16, didRead sampleBuffer: CMSampleBuffer) {
+    public func reader(_ reader: TSReader<SRTStream>, id: UInt16, didRead sampleBuffer: CMSampleBuffer) {
         guard readyState == .playing else {
             return
         }
